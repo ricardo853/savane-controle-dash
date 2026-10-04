@@ -1,0 +1,1849 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Savane Cerâmica - Sistema Integrado de Gestão & Banco de Dados</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --input-bg: #334155;
+      --text-color: #f8fafc;
+      --accent-color: #f59e0b;
+      --accent-hover: #d97706;
+      --border-color: #334155;
+      --green-color: #10b981;
+      --blue-color: #3b82f6;
+      --red-color: #ef4444;
+      --purple-color: #8b5cf6;
+      --teal-color: #14b8a6;
+    }
+
+    body {
+      font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 20px;
+      padding-bottom: 60px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 98%;
+      margin: 0 auto;
+    }
+
+    .brand-logo-auth {
+      max-width: 260px;
+      width: 100%;
+      height: auto;
+      margin-bottom: 20px;
+      filter: brightness(0) invert(1);
+    }
+
+    .brand-logo-header {
+      height: 48px;
+      width: auto;
+      filter: brightness(0) invert(1);
+    }
+
+    .header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: var(--card-bg);
+      padding: 16px 24px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .header-titles .subtitle {
+      margin: 0;
+      font-size: 0.95em;
+      color: #cbd5e1;
+      text-align: left;
+      font-weight: 500;
+    }
+
+    #mainAuthScreen {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background-color: var(--bg-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .auth-card {
+      background-color: var(--card-bg);
+      padding: 40px;
+      border-radius: 16px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+    }
+
+    .auth-card h2 {
+      margin-top: 10px;
+      color: #ffffff;
+      font-size: 1.3em;
+    }
+
+    #appSystem {
+      display: none;
+    }
+
+    h1, h2, h3, h4 {
+      text-align: center;
+      color: #ffffff;
+      margin-bottom: 15px;
+    }
+
+    .nav-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 25px;
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      background-color: #1e293b;
+      color: var(--text-color);
+      padding: 10px 16px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9em;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tab-btn:hover {
+      border-color: var(--accent-color);
+    }
+
+    .tab-btn.active {
+      background-color: var(--accent-color);
+      color: #000;
+      border-color: var(--accent-color);
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 18px;
+      margin-bottom: 25px;
+    }
+
+    .kpi-card {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      padding: 18px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 4px; height: 100%;
+    }
+
+    .kpi-card.blue::before { background-color: var(--blue-color); }
+    .kpi-card.green::before { background-color: var(--green-color); }
+    .kpi-card.teal::before { background-color: var(--teal-color); }
+    .kpi-card.amber::before { background-color: var(--accent-color); }
+    .kpi-card.red::before { background-color: var(--red-color); }
+    .kpi-card.purple::before { background-color: var(--purple-color); }
+
+    .kpi-title {
+      font-size: 0.8em;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #94a3b8;
+      margin-bottom: 8px;
+    }
+
+    .kpi-value {
+      font-size: 1.6em;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .kpi-sub {
+      font-size: 0.78em;
+      margin-top: 6px;
+      color: #64748b;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 15px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 15px;
+    }
+
+    @media (max-width: 900px) {
+      .grid, .grid-3, .grid-4 {
+        grid-template-columns: 1fr;
+      }
+      .header-container {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+      }
+      .header-brand {
+        flex-direction: column;
+      }
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      padding: 22px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: 600;
+      font-size: 0.88em;
+      color: #cbd5e1;
+      text-align: left;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 4px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      background-color: var(--input-bg);
+      color: #fff;
+      box-sizing: border-box;
+      font-size: 0.95em;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    button.btn-primary {
+      width: 100%;
+      padding: 12px;
+      background-color: var(--accent-color);
+      border: none;
+      color: #000;
+      font-weight: bold;
+      font-size: 1em;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 15px;
+      transition: 0.3s;
+    }
+
+    button.btn-primary:hover {
+      background-color: var(--accent-hover);
+    }
+
+    button.btn-danger {
+      background-color: var(--red-color);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button.btn-edit {
+      background-color: var(--blue-color);
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-right: 5px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      background-color: #0f172a;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th, td {
+      border: 1px solid var(--border-color);
+      padding: 10px;
+      text-align: center;
+      font-size: 0.9em;
+    }
+
+    th {
+      background-color: #334155;
+      color: var(--accent-color);
+    }
+
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table.spreadsheet {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      background-color: #0b1329;
+      font-size: 0.8em;
+      white-space: nowrap;
+    }
+
+    table.spreadsheet th, table.spreadsheet td {
+      border: 1px solid #334155;
+      padding: 4px 6px;
+      text-align: center;
+    }
+
+    table.spreadsheet th {
+      background-color: #1e293b;
+      color: #38bdf8;
+      font-weight: bold;
+      font-size: 0.8em;
+    }
+
+    table.spreadsheet tr:nth-child(even) {
+      background-color: rgba(255, 255, 255, 0.02);
+    }
+
+    table.spreadsheet input {
+      width: 100%;
+      min-width: 65px;
+      background: transparent;
+      border: 1px dashed transparent;
+      color: inherit;
+      text-align: center;
+      font-family: inherit;
+      font-size: 0.9em;
+      padding: 4px 2px;
+      margin: 0;
+      border-radius: 3px;
+    }
+    table.spreadsheet input:hover { border-color: #475569; background: rgba(255,255,255,0.05); }
+    table.spreadsheet input:focus { outline: none; background: rgba(0,0,0,0.3); border-color: var(--accent-color); }
+
+    .metrics-summary {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 15px;
+      background: #0f172a;
+      padding: 12px;
+      border-radius: 8px;
+    }
+
+    .metric-box {
+      text-align: center;
+    }
+
+    .metric-val {
+      font-size: 1.2em;
+      font-weight: bold;
+      color: var(--accent-color);
+    }
+
+    .chart-container {
+      position: relative;
+      height: 320px;
+      margin-top: 15px;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: var(--card-bg);
+      padding: 25px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 500px;
+      border: 1px solid var(--border-color);
+    }
+
+    .eq-chip-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .eq-chip {
+      background-color: #334155;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--border-color);
+    }
+
+    .eq-chip.pos-forno {
+      background-color: #0d9488;
+      border-color: #14b8a6;
+    }
+
+    .eq-chip button {
+      background: none;
+      border: none;
+      color: var(--red-color);
+      font-weight: bold;
+      cursor: pointer;
+      padding: 0;
+      font-size: 1.1em;
+    }
+
+    .system-footer {
+      text-align: center;
+      margin-top: 40px;
+      padding: 15px;
+      border-top: 1px solid var(--border-color);
+      color: #94a3b8;
+      font-size: 0.85em;
+      background-color: var(--card-bg);
+      border-radius: 8px;
+    }
+
+    /* ========================================================
+       IMPRESSÃO PDF EM 2 FOLHAS (PAISAGEM / SEM CORTES NA DIREITA)
+       ======================================================== */
+    @page {
+      size: landscape;
+      margin: 8mm;
+    }
+
+    @media print {
+      body {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        padding: 0;
+        font-size: 9pt;
+      }
+
+      .header-container, .nav-tabs, .system-footer, .modal, button, .no-print {
+        display: none !important;
+      }
+
+      .tab-content {
+        display: none !important;
+      }
+
+      #tabRelatorioPDF, #tabPlanilha {
+        display: block !important;
+      }
+
+      #tabRelatorioPDF > *, #tabPlanilha > * {
+        display: none !important;
+      }
+
+      /* Folha 1: Relatório Consolidado e Gráficos */
+      #print_relatorio {
+        display: block !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 15px !important;
+        page-break-after: always;
+      }
+
+      /* Folha 2: Planilha Diária inteira, incluindo o bloco GERAL sem cortes */
+      #print_planilha {
+        display: block !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 10px !important;
+        page-break-before: always;
+      }
+
+      .card, .kpi-card {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: none !important;
+      }
+      
+      .kpi-title, .kpi-sub, label, .subtitle { color: #475569 !important; }
+      .kpi-value, .metric-val { color: #0f172a !important; }
+      
+      table.spreadsheet {
+        width: 100% !important;
+        font-size: 7.2pt !important;
+        background-color: #fff !important;
+        color: #000 !important;
+        border: 1px solid #94a3b8 !important;
+        table-layout: auto !important;
+      }
+      table.spreadsheet th { 
+        background-color: #e2e8f0 !important; 
+        color: #000 !important; 
+        font-size: 7.2pt !important; 
+        padding: 3px 2px !important;
+      }
+      table.spreadsheet td { 
+        border: 1px solid #cbd5e1 !important; 
+        padding: 2px 2px !important; 
+        font-size: 7.2pt !important; 
+      }
+      table.spreadsheet input { 
+        border: none !important; 
+        color: #000 !important; 
+        background: transparent !important; 
+        pointer-events: none; 
+        font-size: 7.2pt !important; 
+        width: 100% !important;
+        padding: 0 !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div id="mainAuthScreen">
+  <div class="auth-card">
+    <img src="{{ url_for('static', filename='SAVANE CERAMICA - PRETO.png') }}" alt="Savane Cerâmica Logo" class="brand-logo-auth">
+    <h2>🔒 Acesso ao Sistema</h2>
+    <p style="font-size: 0.85em; color: #94a3b8; margin-bottom: 20px;">Insira suas credenciais para acessar.</p>
+    
+    <label for="sys_user">Usuário:</label>
+    <input type="text" id="sys_user" placeholder="Digite o usuário">
+
+    <label for="sys_pass">Senha:</label>
+    <input type="password" id="sys_pass" placeholder="Digite a senha">
+
+    <button type="button" class="btn-primary" onclick="autenticarSistema()">🔓 Entrar no Sistema</button>
+    <div id="sys_login_error" style="color:var(--red-color); margin-top:12px; display:none; font-weight:bold;">Credenciais incorretas!</div>
+  </div>
+</div>
+
+<div id="appSystem">
+  <div class="container">
+    
+    <div class="header-container">
+      <div class="header-brand">
+        <img src="{{ url_for('static', filename='SAVANE CERAMICA - PRETO.png') }}" alt="Savane Cerâmica Logo" class="brand-logo-header">
+        <div class="header-titles">
+          <p class="subtitle">Sistema Integrado de Gestão & Banco de Dados Industrial - Linhas 2 e 3</p>
+        </div>
+      </div>
+      <button class="btn-danger" style="width: auto;" onclick="logoutSistema()">🔒 Sair / Bloquear Sistema</button>
+    </div>
+
+    <!-- NAV TABS -->
+    <div class="nav-tabs">
+      <button class="tab-btn active" onclick="switchTab('tabDashboard')">🚀 Dashboard</button>
+      <button class="tab-btn" onclick="switchTab('tabFechamento')">📋 Fechamento</button>
+      <button class="tab-btn" onclick="switchTab('tabFalhas')">📊 Painel Falhas</button>
+      <button class="tab-btn" onclick="switchTab('tabEscolha')" style="background-color: var(--teal-color); color: #fff;">🔍 Eficiência Escolha</button>
+      <button class="tab-btn" onclick="switchTab('tabPlanilha')" style="background-color: #0284c7; color: #fff;">📅 Planilha Diária</button>
+      <button class="tab-btn" onclick="switchTab('tabBDParadas')">⚙️ Banco de Dados</button>
+      <button class="tab-btn" onclick="switchTab('tabRelatorioPDF')" style="background-color: var(--purple-color); color: #fff;">📄 Relatório PDF</button>
+    </div>
+
+    <!-- ABA 1: DASHBOARD EXECUTIVE -->
+    <div id="tabDashboard" class="tab-content active">
+      <div class="kpi-grid">
+        <div class="kpi-card blue"><div class="kpi-title">Produção Acumulada</div><div class="kpi-value" id="kpi_prod_total">0 m²</div><div class="kpi-sub" id="sub_kpi_prod_total">Soma Linha 2 + Linha 3</div></div>
+        <div class="kpi-card blue"><div class="kpi-title">Qualidade Acumulada Linha 2</div><div class="kpi-value" id="kpi_qualidade_l2">0.0%</div><div class="kpi-sub" id="sub_kpi_qualidade_l2">Classe A / Total Linha 2</div></div>
+        <div class="kpi-card teal"><div class="kpi-title">Qualidade Acumulada Linha 3</div><div class="kpi-value" id="kpi_qualidade_l3">0.0%</div><div class="kpi-sub" id="sub_kpi_qualidade_l3">Classe A / Total Linha 3</div></div>
+        <div class="kpi-card green"><div class="kpi-title">Índice Qualidade Geral</div><div class="kpi-value" id="kpi_qualidade_med">0.0%</div><div class="kpi-sub" id="sub_kpi_qualidade_med">Soma Geral (A / Total)</div></div>
+        <div class="kpi-card red"><div class="kpi-title">Tempo Total de Falhas</div><div class="kpi-value" id="kpi_falhas_total">0 min</div><div class="kpi-sub" id="sub_kpi_falhas_total">Somatório Banco de Dados</div></div>
+        <div class="kpi-card purple"><div class="kpi-title">Índice Geral de Quebra</div><div class="kpi-value" id="kpi_quebra_total">0.0%</div><div class="kpi-sub" id="sub_kpi_quebra_total">0 m² caco acumulado</div></div>
+      </div>
+      <div class="grid">
+        <div class="card"><h3>Comparativo de Qualidade Acumulada (%)</h3><div class="chart-container"><canvas id="dashChartQualidade"></canvas></div></div>
+        <div class="card"><h3>Comparativo de Produção por Linha (m²)</h3><div class="chart-container"><canvas id="dashChartComp"></canvas></div></div>
+      </div>
+      <div class="grid">
+        <div class="card"><h3>Soma de Falhas por Departamento (Minutos Total)</h3><div class="chart-container"><canvas id="dashChartDept"></canvas></div></div>
+        <div class="card"><h3>Ranking dos Maiores Gargalos (Equipamentos)</h3><div class="chart-container"><canvas id="dashChartGargalos"></canvas></div></div>
+      </div>
+      <div class="card"><h3>Evolução e Soma Acumulada do Caco Queimado (m²)</h3><div class="chart-container"><canvas id="dashChartQuebra"></canvas></div></div>
+    </div>
+
+    <!-- ABA 2: FECHAMENTO DE TURNO -->
+    <div id="tabFechamento" class="tab-content">
+      <div class="card">
+        <h2>Relatório de Fechamento de Turno</h2>
+        <div class="grid-3">
+          <div>
+            <label for="f_linha">Linha de Produção:</label>
+            <select id="f_linha" onchange="carregarMetaLinha()">
+              <option value="Linha 2">Linha 2</option>
+              <option value="Linha 3">Linha 3</option>
+            </select>
+          </div>
+          <div><label for="f_data">Data:</label><input type="date" id="f_data"></div>
+          <div>
+            <label for="f_turno">Turno:</label>
+            <select id="f_turno">
+              <option value="1">Turno 1</option>
+              <option value="2">Turno 2</option>
+              <option value="3">Turno 3</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid-4">
+          <div><label for="f_formato">Formato:</label><input type="text" id="f_formato" placeholder="Ex: 31X54"></div>
+          <div><label for="f_meta">Meta/Projeto Orçado (m²):</label><input type="number" id="f_meta" value="5600"></div>
+          <div><label for="f_ciclo_forno">Ciclo do Forno (min):</label><input type="number" id="f_ciclo_forno" value="40"></div>
+          <div><label for="f_encarregado">Encarregado do Turno:</label><input type="text" id="f_encarregado" placeholder="Nome"></div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <h3>Produção e Forno (m²)</h3>
+          <label for="f_prod_entrada">Produção Entrada Forno (m²):</label>
+          <input type="number" id="f_prod_entrada" value="0">
+          
+          <label for="f_prod_a">Produção Classe A / Expedida (m²):</label>
+          <input type="number" id="f_prod_a" value="0" oninput="calcularFechamentoTurno()">
+
+          <label for="f_prod_b">Produção Classe B (m²):</label>
+          <input type="number" id="f_prod_b" value="0" oninput="calcularFechamentoTurno()">
+
+          <label for="f_prod_c">Produção Classe C (m²):</label>
+          <input type="number" id="f_prod_c" value="0" oninput="calcularFechamentoTurno()">
+
+          <div class="metrics-summary">
+            <div class="metric-box"><span>Produção Total Turno:</span><div id="res_total_prod" class="metric-val">0 m²</div></div>
+            <div class="metric-box"><span>Qualidade A (%):</span><div id="res_qualidade" class="metric-val">0.0%</div></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Perdas e Falhas</h3>
+          <label for="f_caco_m2">Caco Queimado / Quebra (m²):</label>
+          <input type="number" id="f_caco_m2" value="0" oninput="calcularFechamentoTurno()">
+
+          <label for="f_falha_forno">Falha Forno (min):</label>
+          <input type="number" id="f_falha_forno" value="0">
+
+          <label for="f_emergencia_m2">Emergência (m²):</label>
+          <input type="number" id="f_emergencia_m2" value="0">
+
+          <label for="f_compenser">Situação do Compenser no Final do Turno:</label>
+          <select id="f_compenser">
+            <option value="VAZIO">Vazio</option>
+            <option value="0.25">0.25 (1/4)</option>
+            <option value="0.5">0.5 (Metade)</option>
+            <option value="0.75">0.75 (3/4)</option>
+            <option value="CHEIO">Cheio</option>
+          </select>
+
+          <div class="metrics-summary">
+            <div class="metric-box"><span>Índice Quebra (%):</span><div id="res_quebra_pct" class="metric-val">0.0%</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Registro de Falhas / Paradas do Turno</h3>
+        <div class="grid-4">
+          <div><label for="p_equipamento">Equipamento:</label><select id="p_equipamento"></select></div>
+          <div><label for="p_tempo">Tempo Parado (min):</label><input type="number" id="p_tempo" placeholder="Ex: 35"></div>
+          <div>
+            <label for="p_motivo">Departamento:</label>
+            <select id="p_motivo">
+              <option value="Elétrica">Elétrica</option>
+              <option value="Mecânica">Mecânica</option>
+              <option value="Operacional">Operacional</option>
+              <option value="Troca de Formato">Troca de Formato</option>
+              <option value="Pique de Energia">Pique de Energia</option>
+            </select>
+          </div>
+          <div><label for="p_causa">Descrição / Causa:</label><input type="text" id="p_causa"></div>
+        </div>
+        <button type="button" class="btn-primary" onclick="adicionarParada()">+ Adicionar Ocorrência</button>
+
+        <table>
+          <thead><tr><th>Equipamento</th><th>Tempo (min)</th><th>Departamento</th><th>Descrição</th><th>Ação</th></tr></thead>
+          <tbody id="corpoTabelaParadas"></tbody>
+        </table>
+        <div style="text-align: right; margin-top: 10px; font-weight: bold;">
+          Total Parado no Turno: <span id="totalParadoTurno" style="color:var(--accent-color);">0</span> min
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Ocorrências e Observações do Turno</h3>
+        <textarea id="f_ocorrencias"></textarea>
+        <button type="button" class="btn-primary" onclick="salvarFechamentoTurno()">💾 Salvar Fechamento do Turno</button>
+      </div>
+    </div>
+
+    <!-- ABA 3: PAINEL DE FALHAS DIÁRIAS -->
+    <div id="tabFalhas" class="tab-content">
+      <div class="card">
+        <h2>Painel Geral de Falhas Diárias (Linhas 2 e 3)</h2>
+        <p style="text-align:center; color:#94a3b8; font-size:0.9em;">Eficiência calculada sobre meta de 840 min, descontando Elétrica, Mecânica, Operacional e Falha de Forno (Pique e Troca não reduzem a eficiência).</p>
+      </div>
+
+      <div class="grid">
+        <!-- LINHA 2 -->
+        <div class="card">
+          <h2>LINHA 2 - Acumulado por Departamento</h2>
+          <table>
+            <thead><tr><th>Departamento</th><th>Tempo Total Acumulado</th></tr></thead>
+            <tbody>
+              <tr><td>⚡ Elétrica</td><td><b id="acc_l2_eletrica" style="color:var(--accent-color);">0 min</b></td></tr>
+              <tr><td>⚙️ Mecânica</td><td><b id="acc_l2_mecanica" style="color:var(--blue-color);">0 min</b></td></tr>
+              <tr><td>🏭 Operacional</td><td><b id="acc_l2_operacional" style="color:var(--green-color);">0 min</b></td></tr>
+              <tr><td>🔥 Falha Forno (Fechamentos)</td><td><b id="acc_l2_falha_forno" style="color:var(--teal-color);">0 min</b></td></tr>
+              <tr><td>🔄 Troca de Formato</td><td><b id="acc_l2_troca" style="color:var(--purple-color);">0 min</b></td></tr>
+              <tr><td>⚡ Pique de Energia</td><td><b id="acc_l2_pique" style="color:var(--red-color);">0 min</b></td></tr>
+            </tbody>
+          </table>
+          <div class="metrics-summary" style="margin-top:15px;">
+            <div class="metric-box"><span>Total Falhas (Efetivas):</span><div id="l2_total_time" class="metric-val">0 min</div></div>
+            <div class="metric-box"><span>Eficiência L2 (Meta 840m):</span><div id="l2_eficiencia" class="metric-val">100%</div></div>
+          </div>
+        </div>
+
+        <!-- LINHA 3 -->
+        <div class="card">
+          <h2>LINHA 3 - Acumulado por Departamento</h2>
+          <table>
+            <thead><tr><th>Departamento</th><th>Tempo Total Acumulado</th></tr></thead>
+            <tbody>
+              <tr><td>⚡ Elétrica</td><td><b id="acc_l3_eletrica" style="color:var(--accent-color);">0 min</b></td></tr>
+              <tr><td>⚙️ Mecânica</td><td><b id="acc_l3_mecanica" style="color:var(--blue-color);">0 min</b></td></tr>
+              <tr><td>🏭 Operacional</td><td><b id="acc_l3_operacional" style="color:var(--green-color);">0 min</b></td></tr>
+              <tr><td>🔥 Falha Forno (Fechamentos)</td><td><b id="acc_l3_falha_forno" style="color:var(--teal-color);">0 min</b></td></tr>
+              <tr><td>🔄 Troca de Formato</td><td><b id="acc_l3_troca" style="color:var(--purple-color);">0 min</b></td></tr>
+              <tr><td>⚡ Pique de Energia</td><td><b id="acc_l3_pique" style="color:var(--red-color);">0 min</b></td></tr>
+            </tbody>
+          </table>
+          <div class="metrics-summary" style="margin-top:15px;">
+            <div class="metric-box"><span>Total Falhas (Efetivas):</span><div id="l3_total_time" class="metric-val">0 min</div></div>
+            <div class="metric-box"><span>Eficiência L3 (Meta 840m):</span><div id="l3_eficiencia" class="metric-val">100%</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid" style="margin-top: 25px;">
+        <div class="card"><h3>Linha 2 - Falhas por Departamento</h3><div class="chart-container"><canvas id="chartLinha2"></canvas></div></div>
+        <div class="card"><h3>Linha 3 - Falhas por Departamento</h3><div class="chart-container"><canvas id="chartLinha3"></canvas></div></div>
+      </div>
+
+      <div class="card">
+        <h3>Maiores Causadores de Falha (Equipamentos)</h3>
+        <div class="chart-container" style="height: 350px;"><canvas id="chartCausadores"></canvas></div>
+      </div>
+    </div>
+
+    <!-- ABA 4: EFICIÊNCIA DE ESCOLHA -->
+    <div id="tabEscolha" class="tab-content">
+      <div class="card" style="border: 2px solid var(--teal-color);">
+        <h2 style="color: var(--teal-color);">🔍 Controle e Eficiência de Escolha (Pós-Forno)</h2>
+        <div class="grid-3">
+          <div>
+            <label>Linha de Produção:</label>
+            <select id="esc_linha"><option value="Linha 2">Linha 2</option><option value="Linha 3">Linha 3</option></select>
+          </div>
+          <div><label>Data:</label><input type="date" id="esc_data"></div>
+          <div>
+            <label>Máquina Pós-Forno:</label>
+            <select id="esc_maquina"></select>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div><label>Tempo Parado da Máquina (min):</label><input type="number" id="esc_tempo_parado" value="0" placeholder="Ex: 45"></div>
+          <div><label>Turno Base (min disponíveis):</label><input type="number" id="esc_tempo_total" value="480"></div>
+        </div>
+
+        <button type="button" class="btn-primary" style="background-color: var(--teal-color); color: #fff;" onclick="salvarEficienciaEscolha()">💾 Registrar Desempenho Pós-Forno</button>
+      </div>
+
+      <div class="card">
+        <h3>📋 Histórico de Desempenho Pós-Forno</h3>
+        <table>
+          <thead>
+            <tr><th>Data</th><th>Linha</th><th>Máquina Pós-Forno</th><th>Tempo Parado (min)</th><th>Disponibilidade / Eficiência (%)</th><th>Ações</th></tr>
+          </thead>
+          <tbody id="corpoTabelaEscolha">
+            <tr><td colspan="6" style="text-align: center; color: #94a3b8;">Nenhum registro pós-forno cadastrado.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ABA 5: PLANILHA DIÁRIA -->
+    <div id="tabPlanilha" class="tab-content">
+      <div class="card no-print" style="text-align: right; padding: 10px 20px; background: #1e293b;">
+        <button type="button" class="btn-primary" style="background-color: var(--green-color); color: #fff; max-width: 260px; margin: 0; display: inline-flex; align-items: center; justify-content: center; gap: 8px;" onclick="exportarPlanilhaExcel()">
+          📥 Baixar Planilha em Excel (.CSV)
+        </button>
+      </div>
+
+      <div class="card" id="print_planilha" style="border: 2px solid var(--blue-color); padding: 15px;">
+        <h2 style="color: var(--blue-color); margin-top:0;">📊 OBJETIVO SAVANE - PLANILHA DIÁRIA DE CONTROLE (LINHAS 2 E 3)</h2>
+        <p style="color:#94a3b8; text-align:center; font-size:0.85em;">Preenchimento automático por Data e Turno (Turnos 1, 2 e 3) com soma total consolidada e cálculo de eficiência considerando Falha do Forno, Elétrica, Mecânica e Operacional.</p>
+
+        <div class="table-responsive">
+          <table class="spreadsheet" id="tabelaPlanilhaDiaria">
+            <thead>
+              <tr>
+                <th colspan="11" style="background:#0284c7; color:#fff;">FORNO 2 (LINHA 2)</th>
+                <th colspan="11" style="background:#0d9488; color:#fff;">FORNO 3 (LINHA 3)</th>
+                <th colspan="7" style="background:#475569; color:#fff;">TOTAL GERAL</th>
+              </tr>
+              <tr>
+                <!-- Forno 2 -->
+                <th>Turno</th><th>Formato</th><th>Orçado</th><th>Entrada</th><th>Expedida</th><th>Diferença</th><th>Ciclo</th><th>Efic.%</th><th>Qual.%</th><th>Quebra%</th><th>Falha F.</th>
+                <!-- Forno 3 -->
+                <th>Turno</th><th>Formato</th><th>Orçado</th><th>Entrada</th><th>Expedida</th><th>Diferença</th><th>Ciclo</th><th>Efic.%</th><th>Qual.%</th><th>Quebra%</th><th>Falha F.</th>
+                <!-- Total -->
+                <th>Orçado</th><th>Entrada</th><th>Expedida</th><th>Diferença</th><th>Efic. Geral</th><th>Qual. Geral</th><th>Quebra G.</th>
+              </tr>
+            </thead>
+            <tbody id="corpoPlanilhaDiaria"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABA 6: BANCO DE DADOS E GESTÃO DE EQUIPAMENTOS -->
+    <div id="tabBDParadas" class="tab-content">
+      <div class="card" style="border: 2px solid var(--purple-color);">
+        <h3 style="color: var(--purple-color);">🔧 Cadastro de Equipamentos (Prensas, Fornos, etc.)</h3>
+        <div class="grid" style="grid-template-columns: 2fr 1fr; align-items: end;">
+          <div><label>Nome do Equipamento:</label><input type="text" id="novo_equipamento_nome"></div>
+          <button type="button" class="btn-primary" style="margin-top:0;" onclick="cadastrarEquipamento()">➕ Cadastrar</button>
+        </div>
+        <div id="listaEquipamentosChips" class="eq-chip-list"></div>
+      </div>
+
+      <div class="card" style="border: 2px solid var(--teal-color);">
+        <h3 style="color: var(--teal-color);">🏭 Cadastro de Máquinas Pós-Forno</h3>
+        <div class="grid" style="grid-template-columns: 2fr 1fr; align-items: end;">
+          <div><label>Nome da Máquina Pós-Forno:</label><input type="text" id="nova_maquina_pos_nome" placeholder="Ex: Classificadora 01..."></div>
+          <button type="button" class="btn-primary" style="margin-top:0; background-color: var(--teal-color); color:#fff;" onclick="cadastrarMaquinaPosForno()">➕ Cadastrar Pós-Forno</button>
+        </div>
+        <div id="listaMaquinasPosChips" class="eq-chip-list"></div>
+      </div>
+
+      <div class="card" style="border: 2px solid var(--accent-color);">
+        <h3 style="color: var(--accent-color);">📊 Ajuste Direto de Produção & Qualidade Acumulada</h3>
+        <div class="grid-4">
+          <div><label>Prod. Classe A L2:</label><input type="number" id="edit_prod_a_l2" value="0" onchange="salvarKPIsDashboard()"></div>
+          <div><label>Prod. Total L2:</label><input type="number" id="edit_prod_total_l2" value="0" onchange="salvarKPIsDashboard()"></div>
+          <div><label>Prod. Classe A L3:</label><input type="number" id="edit_prod_a_l3" value="0" onchange="salvarKPIsDashboard()"></div>
+          <div><label>Prod. Total L3:</label><input type="number" id="edit_prod_total_l3" value="0" onchange="salvarKPIsDashboard()"></div>
+        </div>
+        <div class="grid">
+          <div><label>Caco Queimado / Quebra Acumulada (m²):</label><input type="number" id="edit_caco_acumulado" value="0" onchange="salvarKPIsDashboard()"></div>
+        </div>
+        <button type="button" class="btn-primary" onclick="salvarKPIsDashboard()">💾 Salvar e Atualizar Dashboard</button>
+      </div>
+
+      <div class="card">
+        <h3>+ Adicionar Nova Parada no Banco de Dados</h3>
+        <div class="grid-3">
+          <div><label>Linha:</label><select id="bd_linha"><option value="Linha 2">Linha 2</option><option value="Linha 3">Linha 3</option></select></div>
+          <div><label>Data:</label><input type="date" id="bd_data"></div>
+          <div><label>Turno:</label><select id="bd_turno"><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
+        </div>
+        <div class="grid-3">
+          <div><label>Equipamento:</label><select id="bd_equipamento"></select></div>
+          <div>
+            <label>Departamento:</label>
+            <select id="bd_categoria">
+              <option value="Elétrica">Elétrica</option>
+              <option value="Mecânica">Mecânica</option>
+              <option value="Operacional">Operacional</option>
+              <option value="Troca de Formato">Troca de Formato</option>
+              <option value="Pique de Energia">Pique de Energia</option>
+            </select>
+          </div>
+          <div><label>Tempo Parado (min):</label><input type="number" id="bd_tempo"></div>
+        </div>
+        <label>Descrição:</label><input type="text" id="bd_desc">
+        <button type="button" class="btn-primary" onclick="adicionarRegistroBD()">➕ Salvar Registro no Banco de Dados</button>
+      </div>
+
+      <div class="card">
+        <h3>📋 Registros de Paradas Salvos no Banco de Dados</h3>
+        <div class="grid" style="grid-template-columns: 2fr 1fr;">
+          <input type="text" id="searchBD" placeholder="🔍 Buscar por Equipamento, Linha ou Causa..." onkeyup="filtrarBD()">
+          <select id="filterLinha" onchange="filtrarBD()">
+            <option value="TODAS">Todas as Linhas</option>
+            <option value="Linha 2">Linha 2</option>
+            <option value="Linha 3">Linha 3</option>
+          </select>
+        </div>
+        <table>
+          <thead><tr><th>ID</th><th>Data</th><th>Linha</th><th>Turno</th><th>Equipamento</th><th>Depto</th><th>Tempo</th><th>Descrição</th><th>Ações</th></tr></thead>
+          <tbody id="corpoTabelaBD"></tbody>
+        </table>
+        <button type="button" class="btn-danger" style="width: 100%; padding: 12px; margin-top: 20px; font-size: 1em;" onclick="zerarBancoDeDadosTotal()">
+          🗑 Zerar Todo o Banco de Dados e KPIs
+        </button>
+      </div>
+    </div>
+
+    <!-- ABA 7: RELATÓRIO PDF -->
+    <div id="tabRelatorioPDF" class="tab-content">
+      <div class="card no-print" style="text-align: center; border: 2px dashed var(--purple-color);">
+        <h2 style="color: var(--purple-color);">📄 Central de Geração de Relatórios em PDF</h2>
+        <p style="color: #cbd5e1; margin-bottom: 20px;">A impressão gerará exatamente **2 folhas separadas (Paisagem)**.</p>
+        <button type="button" class="btn-primary" style="background-color: var(--purple-color); color: #fff; max-width: 300px; margin: 0 auto; font-size: 1.1em;" onclick="gerarRelatorioPDF()">
+          🖨️ Imprimir / Salvar em 2 Folhas PDF
+        </button>
+      </div>
+      
+      <div class="card" id="print_relatorio">
+        <h2>Relatório Consolidado de Desempenho Industrial</h2>
+        <p style="text-align: center; color: #94a3b8; margin-bottom: 25px;">Savane Cerâmica • Linhas 2 e 3</p>
+        <div class="kpi-grid">
+          <div class="kpi-card blue"><div class="kpi-title">Produção Acumulada</div><div class="kpi-value" id="pdf_kpi_prod_total">0 m²</div></div>
+          <div class="kpi-card blue"><div class="kpi-title">Qualidade L2</div><div class="kpi-value" id="pdf_kpi_qualidade_l2">0.0%</div></div>
+          <div class="kpi-card teal"><div class="kpi-title">Qualidade L3</div><div class="kpi-value" id="pdf_kpi_qualidade_l3">0.0%</div></div>
+          <div class="kpi-card green"><div class="kpi-title">Qualidade Geral</div><div class="kpi-value" id="pdf_kpi_qualidade_med">0.0%</div></div>
+          <div class="kpi-card red"><div class="kpi-title">Total de Falhas</div><div class="kpi-value" id="pdf_kpi_falhas_total">0 min</div></div>
+          <div class="kpi-card purple"><div class="kpi-title">Índice Quebra</div><div class="kpi-value" id="pdf_kpi_quebra_total">0.0%</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RODAPÉ -->
+    <div class="system-footer">
+      © 2026 <strong>Profiaut - Ricardo Rocha</strong>. Todos os direitos reservados.
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL PARA EDIÇÃO DE PARADA -->
+<div id="modalEdicao" class="modal">
+  <div class="modal-content">
+    <h3 style="color:var(--accent-color); text-align:center;">✏️ Editar Registro de Parada</h3>
+    <input type="hidden" id="edit_id">
+    <label>Linha:</label><select id="edit_linha"><option value="Linha 2">Linha 2</option><option value="Linha 3">Linha 3</option></select>
+    <label>Data:</label><input type="date" id="edit_data">
+    <label>Turno:</label><select id="edit_turno"><option value="1">1</option><option value="2">2</option><option value="3">3</option></select>
+    <label>Equipamento:</label><select id="edit_equipamento"></select>
+    <label>Departamento:</label>
+    <select id="edit_categoria">
+      <option value="Elétrica">Elétrica</option>
+      <option value="Mecânica">Mecânica</option>
+      <option value="Operacional">Operacional</option>
+      <option value="Troca de Formato">Troca de Formato</option>
+      <option value="Pique de Energia">Pique de Energia</option>
+    </select>
+    <label>Tempo (min):</label><input type="number" id="edit_tempo">
+    <label>Descrição:</label><input type="text" id="edit_desc">
+    <button type="button" class="btn-primary" onclick="salvarEdicaoBD()">💾 Atualizar Registro</button>
+    <button type="button" style="background:#64748b; color:white; border:none; padding:10px; width:100%; border-radius:6px; margin-top:8px; cursor:pointer;" onclick="fecharModal()">Cancelar</button>
+  </div>
+</div>
+
+<script>
+  let equipamentosPadrao = ["Prensa 01", "Prensa 02", "Forno 01", "Forno 02", "Linha de Esmaltação", "Secador 01", "Qualidade/Escolha", "Geral"];
+  let maquinasPosPadrao = ["Classificador 01", "Classificador 02", "Linha de Embalagem", "Retificadora"];
+  let equipamentos = [];
+  let maquinasPosForno = [];
+  let historicoEscolha = [];
+  let paradasTurnoAtual = [];
+  let bancoParadas = [];
+  let historicoFechamentos = [];
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const elFData = document.getElementById('f_data');
+    if (elFData) elFData.valueAsDate = new Date();
+    const elBdData = document.getElementById('bd_data');
+    if (elBdData) elBdData.valueAsDate = new Date();
+    const elEscData = document.getElementById('esc_data');
+    if (elEscData) elEscData.valueAsDate = new Date();
+  });
+
+  function autenticarSistema() {
+    const user = document.getElementById('sys_user').value.trim();
+    const pass = document.getElementById('sys_pass').value.trim();
+
+    if (user === 'ricardo' && pass === 'eletrica1409') {
+      document.getElementById('mainAuthScreen').style.display = 'none';
+      document.getElementById('appSystem').style.display = 'block';
+      document.getElementById('sys_login_error').style.display = 'none';
+      carregarDadosServidor();
+      inicializarGraficos();
+    } else {
+      document.getElementById('sys_login_error').style.display = 'block';
+    }
+  }
+
+  function logoutSistema() {
+    document.getElementById('mainAuthScreen').style.display = 'flex';
+    document.getElementById('appSystem').style.display = 'none';
+    document.getElementById('sys_user').value = '';
+    document.getElementById('sys_pass').value = '';
+  }
+
+  function gerarRelatorioPDF() {
+    window.print();
+  }
+
+  function exportarPlanilhaExcel() {
+    let csv = [];
+    let rows = document.querySelectorAll("#tabelaPlanilhaDiaria tr");
+    
+    for (let i = 0; i < rows.length; i++) {
+      let row = [], cols = rows[i].querySelectorAll("td, th");
+      for (let j = 0; j < cols.length; j++) {
+        let input = cols[j].querySelector("input");
+        let text = input ? input.value : cols[j].innerText;
+        row.push('"' + text.replace(/"/g, '""') + '"');
+      }
+      csv.push(row.join(";"));
+    }
+
+    let csvFile = new Blob(["\uFEFF" + csv.join("\n")], { type: "text/csv;charset=utf-8;" });
+    let downloadLink = document.createElement("a");
+    downloadLink.download = "Planilha_Diaria_Savane.csv";
+    downloadLink.href = window.URL.createObjectURL(csvFile);
+    downloadLink.style.display = "none";
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+  }
+
+  async function carregarDadosServidor() {
+    try {
+      const response = await fetch('/api/dados');
+      const dados = await response.json();
+
+      equipamentos = dados.equipamentos && dados.equipamentos.length ? dados.equipamentos : [...equipamentosPadrao];
+      maquinasPosForno = dados.maquinasPosForno && dados.maquinasPosForno.length ? dados.maquinasPosForno : [...maquinasPosPadrao];
+      bancoParadas = dados.bancoParadas || [];
+      historicoFechamentos = dados.historicoFechamentos || [];
+      historicoEscolha = dados.historicoEscolha || [];
+
+      if (dados.kpis) {
+        document.getElementById('edit_prod_a_l2').value = dados.kpis.prodAL2 || 0;
+        document.getElementById('edit_prod_total_l2').value = dados.kpis.prodTotalL2 || 0;
+        document.getElementById('edit_prod_a_l3').value = dados.kpis.prodAL3 || 0;
+        document.getElementById('edit_prod_total_l3').value = dados.kpis.prodTotalL3 || 0;
+        document.getElementById('edit_caco_acumulado').value = dados.kpis.cacoAcumulado || 0;
+      }
+
+      atualizarSelectsEquipamentos();
+      renderizarChipsEquipamentos();
+      renderizarChipsMaquinasPos();
+      renderizarTabelaBD();
+      renderizarPlanilhaDiaria();
+      renderizarTabelaEscolha();
+      salvarKPIsDashboard(false);
+      atualizarGraficos();
+    } catch (err) {
+      console.error("Erro ao carregar dados do servidor:", err);
+    }
+  }
+
+  async function salvarDadosServidor() {
+    const kpisObj = {
+      prodAL2: parseFloat(document.getElementById('edit_prod_a_l2').value) || 0,
+      prodTotalL2: parseFloat(document.getElementById('edit_prod_total_l2').value) || 0,
+      prodAL3: parseFloat(document.getElementById('edit_prod_a_l3').value) || 0,
+      prodTotalL3: parseFloat(document.getElementById('edit_prod_total_l3').value) || 0,
+      cacoAcumulado: parseFloat(document.getElementById('edit_caco_acumulado').value) || 0
+    };
+
+    const payload = {
+      equipamentos: equipamentos,
+      maquinasPosForno: maquinasPosForno,
+      bancoParadas: bancoParadas,
+      historicoFechamentos: historicoFechamentos,
+      historicoEscolha: historicoEscolha,
+      kpis: kpisObj
+    };
+
+    try {
+      await fetch('/api/dados', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+    } catch (err) {
+      console.error("Erro ao salvar dados no servidor:", err);
+    }
+  }
+
+  function cadastrarEquipamento() {
+    const nome = document.getElementById('novo_equipamento_nome').value.trim();
+    if (!nome) { alert('Digite o nome do equipamento.'); return; }
+    if (equipamentos.includes(nome)) { alert('Equipamento já cadastrado.'); return; }
+    equipamentos.push(nome);
+    salvarDadosServidor();
+    atualizarSelectsEquipamentos();
+    renderizarChipsEquipamentos();
+    document.getElementById('novo_equipamento_nome').value = '';
+  }
+
+  function excluirEquipamento(nome) {
+    if (confirm(`Deseja remover "${nome}"?`)) {
+      equipamentos = equipamentos.filter(e => e !== nome);
+      salvarDadosServidor();
+      atualizarSelectsEquipamentos();
+      renderizarChipsEquipamentos();
+    }
+  }
+
+  function renderizarChipsEquipamentos() {
+    const container = document.getElementById('listaEquipamentosChips');
+    container.innerHTML = '';
+    equipamentos.forEach(eq => {
+      container.innerHTML += `<div class="eq-chip"><span>${eq}</span><button onclick="excluirEquipamento('${eq}')">&times;</button></div>`;
+    });
+  }
+
+  function cadastrarMaquinaPosForno() {
+    const nome = document.getElementById('nova_maquina_pos_nome').value.trim();
+    if (!nome) { alert('Digite o nome da máquina pós-forno.'); return; }
+    if (maquinasPosForno.includes(nome)) { alert('Máquina já cadastrada.'); return; }
+    maquinasPosForno.push(nome);
+    salvarDadosServidor();
+    atualizarSelectsEquipamentos();
+    renderizarChipsMaquinasPos();
+    document.getElementById('nova_maquina_pos_nome').value = '';
+  }
+
+  function excluirMaquinaPos(nome) {
+    if (confirm(`Deseja remover "${nome}"?`)) {
+      maquinasPosForno = maquinasPosForno.filter(m => m !== nome);
+      salvarDadosServidor();
+      atualizarSelectsEquipamentos();
+      renderizarChipsMaquinasPos();
+    }
+  }
+
+  function renderizarChipsMaquinasPos() {
+    const container = document.getElementById('listaMaquinasPosChips');
+    container.innerHTML = '';
+    maquinasPosForno.forEach(m => {
+      container.innerHTML += `<div class="eq-chip pos-forno"><span>${m}</span><button onclick="excluirMaquinaPos('${m}')">&times;</button></div>`;
+    });
+  }
+
+  function atualizarSelectsEquipamentos() {
+    ['p_equipamento', 'bd_equipamento', 'edit_equipamento'].forEach(id => {
+      const select = document.getElementById(id);
+      if (!select) return;
+      const valorAtual = select.value;
+      select.innerHTML = '';
+      equipamentos.forEach(eq => { select.innerHTML += `<option value="${eq}">${eq}</option>`; });
+      if (valorAtual && equipamentos.includes(valorAtual)) { select.value = valorAtual; }
+    });
+
+    const selectEsc = document.getElementById('esc_maquina');
+    if (selectEsc) {
+      const valAtual = selectEsc.value;
+      selectEsc.innerHTML = '';
+      maquinasPosForno.forEach(m => { selectEsc.innerHTML += `<option value="${m}">${m}</option>`; });
+      if (valAtual && maquinasPosForno.includes(valAtual)) { selectEsc.value = valAtual; }
+    }
+  }
+
+  function salvarEficienciaEscolha() {
+    const linha = document.getElementById('esc_linha').value;
+    const data = document.getElementById('esc_data').value;
+    const maquina = document.getElementById('esc_maquina').value;
+    const tempoParado = parseFloat(document.getElementById('esc_tempo_parado').value) || 0;
+    const tempoTotal = parseFloat(document.getElementById('esc_tempo_total').value) || 480;
+
+    if (!maquina) { alert('Selecione a máquina pós-forno.'); return; }
+
+    const tempoOperando = Math.max(0, tempoTotal - tempoParado);
+    const eficiencia = tempoTotal > 0 ? ((tempoOperando / tempoTotal) * 100).toFixed(1) + '%' : '100.0%';
+
+    historicoEscolha.push({ data, linha, maquina, tempoParado, eficiencia });
+    salvarDadosServidor();
+    renderizarTabelaEscolha();
+
+    document.getElementById('esc_tempo_parado').value = '';
+    alert('Desempenho pós-forno registrado com sucesso!');
+  }
+
+  function renderizarTabelaEscolha() {
+    const tbody = document.getElementById('corpoTabelaEscolha');
+    tbody.innerHTML = '';
+    if (historicoEscolha.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #94a3b8;">Nenhum registro pós-forno cadastrado.</td></tr>';
+      return;
+    }
+    historicoEscolha.forEach((h, idx) => {
+      tbody.innerHTML += `
+        <tr>
+          <td>${h.data}</td><td>${h.linha}</td><td>${h.maquina}</td><td>${h.tempoParado} min</td>
+          <td style="color:var(--teal-color); font-weight:bold;">${h.eficiencia}</td>
+          <td><button class="btn-danger" onclick="excluirRegistroEscolha(${idx})">Excluir</button></td>
+        </tr>
+      `;
+    });
+  }
+
+  function excluirRegistroEscolha(idx) {
+    if (confirm('Deseja excluir este registro?')) {
+      historicoEscolha.splice(idx, 1);
+      salvarDadosServidor();
+      renderizarTabelaEscolha();
+    }
+  }
+
+  let chartL2, chartL3, chartCausadores;
+  let dashChartComp, dashChartQualidade, dashChartDept, dashChartGargalos, dashChartQuebra;
+
+  function switchTab(tabId) {
+    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    if (event && event.currentTarget) { event.currentTarget.classList.add('active'); }
+    if(tabId === 'tabFalhas' || tabId === 'tabDashboard' || tabId === 'tabPlanilha' || tabId === 'tabEscolha') { 
+      atualizarGraficos(); 
+      renderizarPlanilhaDiaria(); 
+    }
+  }
+
+  function salvarKPIsDashboard(persistir = true) {
+    const prodAL2 = parseFloat(document.getElementById('edit_prod_a_l2').value) || 0;
+    const prodTotalL2 = parseFloat(document.getElementById('edit_prod_total_l2').value) || 0;
+    const prodAL3 = parseFloat(document.getElementById('edit_prod_a_l3').value) || 0;
+    const prodTotalL3 = parseFloat(document.getElementById('edit_prod_total_l3').value) || 0;
+    const cacoAcumulado = parseFloat(document.getElementById('edit_caco_acumulado').value) || 0;
+
+    const qualL2 = prodTotalL2 > 0 ? ((prodAL2 / prodTotalL2) * 100).toFixed(1) : '0.0';
+    const qualL3 = prodTotalL3 > 0 ? ((prodAL3 / prodTotalL3) * 100).toFixed(1) : '0.0';
+
+    const prodTotalGeral = prodTotalL2 + prodTotalL3;
+    const prodAGeral = prodAL2 + prodAL3;
+    const qualGeral = prodTotalGeral > 0 ? ((prodAGeral / prodTotalGeral) * 100).toFixed(1) : '0.0';
+
+    const pctQuebraGeral = (prodTotalGeral + cacoAcumulado) > 0 ? ((cacoAcumulado / (prodTotalGeral + cacoAcumulado)) * 100).toFixed(1) : '0.0';
+    const totalFalhasMinutos = bancoParadas.reduce((acc, curr) => acc + (parseInt(curr.tempo) || 0), 0);
+
+    document.getElementById('kpi_prod_total').innerText = prodTotalGeral.toLocaleString('pt-BR') + ' m²';
+    document.getElementById('kpi_qualidade_l2').innerText = qualL2 + '%';
+    document.getElementById('kpi_qualidade_l3').innerText = qualL3 + '%';
+    document.getElementById('kpi_qualidade_med').innerText = qualGeral + '%';
+    document.getElementById('kpi_falhas_total').innerText = totalFalhasMinutos.toLocaleString('pt-BR') + ' min';
+    document.getElementById('kpi_quebra_total').innerText = pctQuebraGeral + '%';
+    document.getElementById('sub_kpi_quebra_total').innerText = `${cacoAcumulado.toLocaleString('pt-BR')} m² caco acumulado`;
+
+    document.getElementById('pdf_kpi_prod_total').innerText = prodTotalGeral.toLocaleString('pt-BR') + ' m²';
+    document.getElementById('pdf_kpi_qualidade_l2').innerText = qualL2 + '%';
+    document.getElementById('pdf_kpi_qualidade_l3').innerText = qualL3 + '%';
+    document.getElementById('pdf_kpi_qualidade_med').innerText = qualGeral + '%';
+    document.getElementById('pdf_kpi_falhas_total').innerText = totalFalhasMinutos.toLocaleString('pt-BR') + ' min';
+    document.getElementById('pdf_kpi_quebra_total').innerText = pctQuebraGeral + '%';
+
+    if (dashChartComp) { dashChartComp.data.datasets[0].data = [prodTotalL2, prodTotalL3]; dashChartComp.update(); }
+    if (dashChartQualidade) { dashChartQualidade.data.datasets[0].data = [parseFloat(qualL2), parseFloat(qualL3), parseFloat(qualGeral)]; dashChartQualidade.update(); }
+    if (persistir) { salvarDadosServidor(); }
+  }
+
+  function carregarMetaLinha() {
+    const linha = document.getElementById('f_linha').value;
+    document.getElementById('f_meta').value = linha === 'Linha 2' ? 5600 : 6200;
+  }
+
+  function calcularFechamentoTurno() {
+    const prodA = parseFloat(document.getElementById('f_prod_a').value) || 0;
+    const prodB = parseFloat(document.getElementById('f_prod_b').value) || 0;
+    const prodC = parseFloat(document.getElementById('f_prod_c').value) || 0;
+    const caco = parseFloat(document.getElementById('f_caco_m2').value) || 0;
+    const totalProd = prodA + prodB + prodC;
+    const qualidade = totalProd > 0 ? ((prodA / totalProd) * 100).toFixed(1) : '0.0';
+    const pctQuebra = (totalProd + caco) > 0 ? ((caco / (totalProd + caco)) * 100).toFixed(1) : '0.0';
+
+    document.getElementById('res_total_prod').innerText = totalProd.toLocaleString('pt-BR') + ' m²';
+    document.getElementById('res_qualidade').innerText = qualidade + '%';
+    document.getElementById('res_quebra_pct').innerText = pctQuebra + '%';
+  }
+
+  function adicionarParada() {
+    const equipamento = document.getElementById('p_equipamento').value;
+    const tempo = parseInt(document.getElementById('p_tempo').value);
+    const motivo = document.getElementById('p_motivo').value;
+    const causa = document.getElementById('p_causa').value.trim();
+
+    if (!tempo || !causa || !equipamento) { alert('Informe o equipamento, tempo e causa da parada.'); return; }
+    paradasTurnoAtual.push({ equipamento, tempo, motivo, causa });
+    document.getElementById('p_tempo').value = '';
+    document.getElementById('p_causa').value = '';
+    renderizarTabelaParadasTurno();
+  }
+
+  function removerParada(index) {
+    paradasTurnoAtual.splice(index, 1);
+    renderizarTabelaParadasTurno();
+  }
+
+  function renderizarTabelaParadasTurno() {
+    const tbody = document.getElementById('corpoTabelaParadas');
+    tbody.innerHTML = '';
+    let total = 0;
+    paradasTurnoAtual.forEach((p, idx) => {
+      total += p.tempo;
+      tbody.innerHTML += `<tr><td>${p.equipamento}</td><td>${p.tempo}</td><td>${p.motivo}</td><td>${p.causa}</td><td><button class="btn-danger" onclick="removerParada(${idx})">Remover</button></td></tr>`;
+    });
+    document.getElementById('totalParadoTurno').innerText = total;
+  }
+
+  function salvarFechamentoTurno() {
+    const linha = document.getElementById('f_linha').value;
+    const data = document.getElementById('f_data').value;
+    const turno = document.getElementById('f_turno').value;
+    
+    const prodA = parseFloat(document.getElementById('f_prod_a').value) || 0;
+    const prodB = parseFloat(document.getElementById('f_prod_b').value) || 0;
+    const prodC = parseFloat(document.getElementById('f_prod_c').value) || 0;
+    const cacoM2 = parseFloat(document.getElementById('f_caco_m2').value) || 0;
+    const totalTurno = prodA + prodB + prodC;
+
+    const formato = document.getElementById('f_formato').value || '-';
+    const projetoOrcado = parseFloat(document.getElementById('f_meta').value) || 0;
+    const cicloForno = parseFloat(document.getElementById('f_ciclo_forno').value) || 0;
+    const prodEntrada = parseFloat(document.getElementById('f_prod_entrada').value) || 0;
+    const falhaForno = parseFloat(document.getElementById('f_falha_forno').value) || 0;
+
+    let prodAL2 = parseFloat(document.getElementById('edit_prod_a_l2').value) || 0;
+    let prodTotalL2 = parseFloat(document.getElementById('edit_prod_total_l2').value) || 0;
+    let prodAL3 = parseFloat(document.getElementById('edit_prod_a_l3').value) || 0;
+    let prodTotalL3 = parseFloat(document.getElementById('edit_prod_total_l3').value) || 0;
+
+    if (linha === 'Linha 2') {
+      prodAL2 += prodA;
+      prodTotalL2 += totalTurno;
+      document.getElementById('edit_prod_a_l2').value = prodAL2;
+      document.getElementById('edit_prod_total_l2').value = prodTotalL2;
+    } else if (linha === 'Linha 3') {
+      prodAL3 += prodA;
+      prodTotalL3 += totalTurno;
+      document.getElementById('edit_prod_a_l3').value = prodAL3;
+      document.getElementById('edit_prod_total_l3').value = prodTotalL3;
+    }
+
+    let cacoAcumulado = parseFloat(document.getElementById('edit_caco_acumulado').value) || 0;
+    cacoAcumulado += cacoM2;
+    document.getElementById('edit_caco_acumulado').value = cacoAcumulado;
+
+    const diferenca = totalTurno - projetoOrcado;
+    const qualidade = prodEntrada > 0 ? ((totalTurno / prodEntrada) * 100).toFixed(1) + '%' : '0.0%';
+    const quebraPct = (totalTurno + cacoM2) > 0 ? ((cacoM2 / (totalTurno + cacoM2)) * 100).toFixed(1) + '%' : '0.0%';
+
+    // CÁLCULO DE EFICIÊNCIA DO TURNO (Meta 840 min, somando Falha do Forno + Elétrica + Mecânica + Operacional)
+    let paradasEfetivasMin = falhaForno;
+    paradasTurnoAtual.forEach(p => {
+      if (['Elétrica', 'Mecânica', 'Operacional'].includes(p.motivo)) {
+        paradasEfetivasMin += p.tempo;
+      }
+    });
+    const eficienciaTurnoVal = Math.max(0, (((840 - paradasEfetivasMin) / 840) * 100)).toFixed(1) + '%';
+
+    // BUSCA OU CRIA REGISTRO PARA ESSA DATA E TURNO EXATOS
+    let registroExistente = historicoFechamentos.find(h => h.data === data && h.linha === linha && String(h.turno) === String(turno));
+
+    if (registroExistente) {
+      registroExistente.prodTotal = totalTurno;
+      registroExistente.prodA = prodA;
+      registroExistente.cacoM2 = cacoM2;
+      registroExistente.formato = formato;
+      registroExistente.projetoOrcado = projetoOrcado;
+      registroExistente.cicloForno = cicloForno;
+      registroExistente.prodEntrada = prodEntrada;
+      registroExistente.falhaForno = falhaForno;
+      registroExistente.diferenca = diferenca;
+      registroExistente.eficiencia = eficienciaTurnoVal;
+      registroExistente.qualidade = qualidade;
+      registroExistente.quebraPct = quebraPct;
+    } else {
+      historicoFechamentos.push({ 
+        data, linha, turno, prodTotal: totalTurno, prodA, cacoM2,
+        formato, projetoOrcado, cicloForno, prodEntrada, falhaForno, 
+        diferenca, eficiencia: eficienciaTurnoVal, qualidade, quebraPct 
+      });
+    }
+
+    if (paradasTurnoAtual.length > 0) {
+      paradasTurnoAtual.forEach(p => {
+        const novoId = bancoParadas.length ? Math.max(...bancoParadas.map(b => b.id)) + 1 : 1;
+        bancoParadas.push({
+          id: novoId, data: data, linha: linha, turno: turno,
+          equipamento: p.equipamento, categoria: p.motivo, tempo: p.tempo, desc: p.causa
+        });
+      });
+      paradasTurnoAtual = [];
+      renderizarTabelaParadasTurno();
+      renderizarTabelaBD();
+    }
+
+    salvarKPIsDashboard(true);
+    atualizarGraficos();
+    renderizarPlanilhaDiaria();
+    alert(`Fechamento salvo e integrado na Planilha Diária para a data ${data} (Turno ${turno})!`);
+  }
+
+  function atualizarCelulaPlanilha(idHistorico, linhaReal, turnoPadrao, campo, valor) {
+    let item = historicoFechamentos[idHistorico];
+    if (!item) {
+        item = { 
+            data: new Date().toISOString().split('T')[0], linha: linhaReal, turno: turnoPadrao, 
+            formato: '', projetoOrcado: 0, prodEntrada: 0, prodTotal: 0, 
+            cicloForno: 0, falhaForno: 0, cacoM2: 0 
+        };
+        historicoFechamentos.push(item);
+        idHistorico = historicoFechamentos.length - 1;
+    }
+
+    if (['projetoOrcado', 'prodEntrada', 'prodTotal', 'cicloForno', 'falhaForno'].includes(campo)) {
+        item[campo] = parseFloat(valor) || 0;
+    } else {
+        item[campo] = valor;
+    }
+
+    item.diferenca = (item.prodTotal || 0) - (item.projetoOrcado || 0);
+    const falhaF = item.falhaForno || 0;
+    item.eficiencia = Math.max(0, (((840 - falhaF) / 840) * 100)).toFixed(1) + '%';
+    item.qualidade = item.prodEntrada > 0 ? (((item.prodTotal || 0) / item.prodEntrada) * 100).toFixed(1) + '%' : '0.0%';
+    item.quebraPct = ((item.prodTotal || 0) + (item.cacoM2 || 0)) > 0 ? (((item.cacoM2 || 0) / ((item.prodTotal || 0) + (item.cacoM2 || 0))) * 100).toFixed(1) + '%' : '0.0%';
+
+    salvarDadosServidor();
+    renderizarPlanilhaDiaria();
+  }
+
+  function renderizarPlanilhaDiaria() {
+    const tbody = document.getElementById('corpoPlanilhaDiaria');
+    tbody.innerHTML = '';
+
+    // Agrupa e ordena os registros por Data e Turno (1, 2 e 3)
+    let turnosPadrao = [
+      { turno: "1", label: "Turno 1" },
+      { turno: "2", label: "Turno 2" },
+      { turno: "3", label: "Turno 3" }
+    ];
+
+    // Coletar datas únicas ordenadas
+    let datasUnicas = [...new Set(historicoFechamentos.map(h => h.data))];
+    if (datasUnicas.length === 0) {
+      datasUnicas = [new Date().toISOString().split('T')[0]];
+    }
+    datasUnicas.sort();
+
+    let totalGeralOrcado = 0, totalGeralEntrada = 0, totalGeralExpedida = 0, totalGeralCaco = 0, totalGeralFalha = 0;
+
+    datasUnicas.forEach(dataStr => {
+      // Cabeçalho de Data na Planilha
+      tbody.innerHTML += `
+        <tr style="background-color: #334155; font-weight: bold;">
+          <td colspan="11" style="text-align:left; color:#f8fafc; padding-left:10px;">📅 Data: ${dataStr} (Linha 2)</td>
+          <td colspan="11" style="text-align:left; color:#f8fafc; padding-left:10px;">📅 Data: ${dataStr} (Linha 3)</td>
+          <td colspan="7" style="text-align:left; color:#f8fafc; padding-left:10px;">Consolidado Diário</td>
+        </tr>
+      `;
+
+      turnosPadrao.forEach(t => {
+        const h2 = historicoFechamentos.find(h => h.data === dataStr && h.linha === 'Linha 2' && String(h.turno) === t.turno) || {};
+        const h3 = historicoFechamentos.find(h => h.data === dataStr && h.linha === 'Linha 3' && String(h.turno) === t.turno) || {};
+        const id2 = historicoFechamentos.indexOf(h2);
+        const id3 = historicoFechamentos.indexOf(h3);
+
+        const totOrcado = (h2.projetoOrcado || 0) + (h3.projetoOrcado || 0);
+        const totEntrada = (h2.prodEntrada || 0) + (h3.prodEntrada || 0);
+        const totExpedida = (h2.prodTotal || 0) + (h3.prodTotal || 0);
+        const totDif = totExpedida - totOrcado;
+        const totCaco = (h2.cacoM2 || 0) + (h3.cacoM2 || 0);
+        
+        const totEfic = totOrcado > 0 ? ((totExpedida / totOrcado) * 100).toFixed(1) + '%' : '-';
+        const totQual = totEntrada > 0 ? ((totExpedida / totEntrada) * 100).toFixed(1) + '%' : '-';
+        const totQuebra = (totExpedida + totCaco) > 0 ? ((totCaco / (totExpedida + totCaco)) * 100).toFixed(1) + '%' : '-';
+
+        totalGeralOrcado += totOrcado;
+        totalGeralEntrada += totEntrada;
+        totalGeralExpedida += totExpedida;
+        totalGeralCaco += totCaco;
+
+        tbody.innerHTML += `
+          <tr>
+            <td>${t.turno}</td>
+            <td><input type="text" value="${h2.formato || ''}" onchange="atualizarCelulaPlanilha(${id2}, 'Linha 2', ${t.turno}, 'formato', this.value)"></td>
+            <td><input type="number" value="${h2.projetoOrcado || ''}" onchange="atualizarCelulaPlanilha(${id2}, 'Linha 2', ${t.turno}, 'projetoOrcado', this.value)"></td>
+            <td><input type="number" value="${h2.prodEntrada || ''}" onchange="atualizarCelulaPlanilha(${id2}, 'Linha 2', ${t.turno}, 'prodEntrada', this.value)"></td>
+            <td><input type="number" value="${h2.prodTotal || ''}" onchange="atualizarCelulaPlanilha(${id2}, 'Linha 2', ${t.turno}, 'prodTotal', this.value)"></td>
+            <td style="color:${(h2.diferenca||0)>=0?'#10b981':'#ef4444'}; font-weight:bold;">${h2.diferenca !== undefined ? h2.diferenca : '-'}</td>
+            <td><input type="number" value="${h2.cicloForno || ''}" onchange="atualizarCelulaPlanilha(${id2}, 'Linha 2', ${t.turno}, 'cicloForno', this.value)"></td>
+            <td>${h2.eficiencia || '-'}</td>
+            <td>${h2.qualidade || '-'}</td>
+            <td>${h2.quebraPct || '-'}</td>
+            <td><input type="number" value="${h2.falhaForno !== undefined ? h2.falhaForno : ''}" onchange="atualizarCelulaPlanilha(${id2}, 'Linha 2', ${t.turno}, 'falhaForno', this.value)"></td>
+
+            <td>${t.turno}</td>
+            <td><input type="text" value="${h3.formato || ''}" onchange="atualizarCelulaPlanilha(${id3}, 'Linha 3', ${t.turno}, 'formato', this.value)"></td>
+            <td><input type="number" value="${h3.projetoOrcado || ''}" onchange="atualizarCelulaPlanilha(${id3}, 'Linha 3', ${t.turno}, 'projetoOrcado', this.value)"></td>
+            <td><input type="number" value="${h3.prodEntrada || ''}" onchange="atualizarCelulaPlanilha(${id3}, 'Linha 3', ${t.turno}, 'prodEntrada', this.value)"></td>
+            <td><input type="number" value="${h3.prodTotal || ''}" onchange="atualizarCelulaPlanilha(${id3}, 'Linha 3', ${t.turno}, 'prodTotal', this.value)"></td>
+            <td style="color:${(h3.diferenca||0)>=0?'#10b981':'#ef4444'}; font-weight:bold;">${h3.diferenca !== undefined ? h3.diferenca : '-'}</td>
+            <td><input type="number" value="${h3.cicloForno || ''}" onchange="atualizarCelulaPlanilha(${id3}, 'Linha 3', ${t.turno}, 'cicloForno', this.value)"></td>
+            <td>${h3.eficiencia || '-'}</td>
+            <td>${h3.qualidade || '-'}</td>
+            <td>${h3.quebraPct || '-'}</td>
+            <td><input type="number" value="${h3.falhaForno !== undefined ? h3.falhaForno : ''}" onchange="atualizarCelulaPlanilha(${id3}, 'Linha 3', ${t.turno}, 'falhaForno', this.value)"></td>
+
+            <td><b>${totOrcado || '-'}</b></td>
+            <td><b>${totEntrada || '-'}</b></td>
+            <td><b>${totExpedida || '-'}</b></td>
+            <td style="color:${totDif>=0?'#10b981':'#ef4444'}; font-weight:bold;"><b>${totExpedida ? totDif : '-'}</b></td>
+            <td><b>${totEfic}</b></td>
+            <td><b>${totQual}</b></td>
+            <td><b>${totQuebra}</b></td>
+          </tr>
+        `;
+      });
+    });
+
+    // LINHA DE SOMA TOTAL ACUMULADA DOS 3 TURNOS
+    if (historicoFechamentos.length > 0) {
+      const l2Itens = historicoFechamentos.filter(h => h.linha === 'Linha 2');
+      const l3Itens = historicoFechamentos.filter(h => h.linha === 'Linha 3');
+
+      const somaOrcadoL2 = l2Itens.reduce((acc, curr) => acc + (parseFloat(curr.projetoOrcado) || 0), 0);
+      const somaEntradaL2 = l2Itens.reduce((acc, curr) => acc + (parseFloat(curr.prodEntrada) || 0), 0);
+      const somaExpedidaL2 = l2Itens.reduce((acc, curr) => acc + (parseFloat(curr.prodTotal) || 0), 0);
+      const somaDifL2 = somaExpedidaL2 - somaOrcadoL2;
+      const somaCacoL2 = l2Itens.reduce((acc, curr) => acc + (parseFloat(curr.cacoM2) || 0), 0);
+      const somaFalhaL2 = l2Itens.reduce((acc, curr) => acc + (parseFloat(curr.falhaForno) || 0), 0);
+      const efL2 = somaOrcadoL2 > 0 ? ((somaExpedidaL2 / somaOrcadoL2) * 100).toFixed(1) + '%' : '-';
+      const qualL2 = somaEntradaL2 > 0 ? ((somaExpedidaL2 / somaEntradaL2) * 100).toFixed(1) + '%' : '-';
+      const quebL2 = (somaExpedidaL2 + somaCacoL2) > 0 ? ((somaCacoL2 / (somaExpedidaL2 + somaCacoL2)) * 100).toFixed(1) + '%' : '-';
+
+      const somaOrcadoL3 = l3Itens.reduce((acc, curr) => acc + (parseFloat(curr.projetoOrcado) || 0), 0);
+      const somaEntradaL3 = l3Itens.reduce((acc, curr) => acc + (parseFloat(curr.prodEntrada) || 0), 0);
+      const somaExpedidaL3 = l3Itens.reduce((acc, curr) => acc + (parseFloat(curr.prodTotal) || 0), 0);
+      const somaDifL3 = somaExpedidaL3 - somaOrcadoL3;
+      const somaCacoL3 = l3Itens.reduce((acc, curr) => acc + (parseFloat(curr.cacoM2) || 0), 0);
+      const somaFalhaL3 = l3Itens.reduce((acc, curr) => acc + (parseFloat(curr.falhaForno) || 0), 0);
+      const efL3 = somaOrcadoL3 > 0 ? ((somaExpedidaL3 / somaOrcadoL3) * 100).toFixed(1) + '%' : '-';
+      const qualL3 = somaEntradaL3 > 0 ? ((somaExpedidaL3 / somaEntradaL3) * 100).toFixed(1) + '%' : '-';
+      const quebL3 = (somaExpedidaL3 + somaCacoL3) > 0 ? ((somaCacoL3 / (somaExpedidaL3 + somaCacoL3)) * 100).toFixed(1) + '%' : '-';
+
+      const totalOrcadoGeral = somaOrcadoL2 + somaOrcadoL3;
+      const totalEntradaGeral = somaEntradaL2 + somaEntradaL3;
+      const totalExpedidaGeral = somaExpedidaL2 + somaExpedidaL3;
+      const totalDifGeral = totalExpedidaGeral - totalOrcadoGeral;
+      const totalCacoGeral = somaCacoL2 + somaCacoL3;
+      const totalEficGeral = totalOrcadoGeral > 0 ? ((totalExpedidaGeral / totalOrcadoGeral) * 100).toFixed(1) + '%' : '-';
+      const totalQualGeral = totalEntradaGeral > 0 ? ((totalExpedidaGeral / totalEntradaGeral) * 100).toFixed(1) + '%' : '-';
+      const totalQuebraGeral = (totalExpedidaGeral + totalCacoGeral) > 0 ? ((totalCacoGeral / (totalExpedidaGeral + totalCacoGeral)) * 100).toFixed(1) + '%' : '-';
+
+      tbody.innerHTML += `
+        <tr style="background-color: #1e293b; font-weight: bold; border-top: 2px solid var(--accent-color);">
+          <td>SOMA</td><td>TOTAL</td><td>${somaOrcadoL2}</td><td>${somaEntradaL2}</td><td>${somaExpedidaL2}</td><td style="color:${somaDifL2>=0?'#10b981':'#ef4444'}">${somaDifL2}</td><td>-</td><td>${efL2}</td><td>${qualL2}</td><td>${quebL2}</td><td>${somaFalhaL2}</td>
+          <td>SOMA</td><td>TOTAL</td><td>${somaOrcadoL3}</td><td>${somaEntradaL3}</td><td>${somaExpedidaL3}</td><td style="color:${somaDifL3>=0?'#10b981':'#ef4444'}">${somaDifL3}</td><td>-</td><td>${efL3}</td><td>${qualL3}</td><td>${quebL3}</td><td>${somaFalhaL3}</td>
+          <td>${totalOrcadoGeral}</td><td>${totalEntradaGeral}</td><td>${totalExpedidaGeral}</td><td style="color:${totalDifGeral>=0?'#10b981':'#ef4444'}">${totalDifGeral}</td><td>${totalEficGeral}</td><td>${totalQualGeral}</td><td>${totalQuebraGeral}</td>
+        </tr>
+      `;
+    }
+  }
+
+  function inicializarGraficos() {
+    const chartOptions = {
+      responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#f8fafc' } } },
+      scales: { x: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } }, y: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } } }
+    };
+
+    dashChartQualidade = new Chart(document.getElementById('dashChartQualidade'), {
+      type: 'bar',
+      data: { labels: ['Linha 2', 'Linha 3', 'Geral Acumulada'], datasets: [{ label: 'Qualidade Acumulada (%)', data: [0, 0, 0], backgroundColor: ['#3b82f6', '#14b8a6', '#10b981'] }] },
+      options: { ...chartOptions, scales: { x: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } }, y: { min: 0, max: 100, ticks: { color: '#94a3b8' }, grid: { color: '#334155' } } } }
+    });
+
+    dashChartComp = new Chart(document.getElementById('dashChartComp'), {
+      type: 'bar',
+      data: { labels: ['Linha 2', 'Linha 3'], datasets: [{ label: 'Produção Acumulada (m²)', data: [0, 0], backgroundColor: ['#3b82f6', '#10b981'] }] },
+      options: chartOptions
+    });
+
+    dashChartDept = new Chart(document.getElementById('dashChartDept'), {
+      type: 'doughnut',
+      data: { labels: ['Elétrica', 'Mecânica', 'Operacional', 'Troca de Formato', 'Pique de Energia'], datasets: [{ data: [0, 0, 0, 0, 0], backgroundColor: ['#f59e0b', '#3b82f6', '#10b981', '#8b5cf6', '#ef4444'] }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#fff' } } } }
+    });
+
+    dashChartGargalos = new Chart(document.getElementById('dashChartGargalos'), {
+      type: 'bar',
+      data: { labels: ['Nenhum registro'], datasets: [{ label: 'Tempo Parado (min)', data: [0], backgroundColor: '#ef4444' }] },
+      options: chartOptions
+    });
+
+    dashChartQuebra = new Chart(document.getElementById('dashChartQuebra'), {
+      type: 'line',
+      data: { labels: ['Sem registros'], datasets: [{ label: 'Caco no Turno (m²)', data: [0], borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.2)', fill: true }, { label: 'Soma Acumulada de Caco (m²)', data: [0], borderColor: '#8b5cf6', backgroundColor: 'transparent', borderDash: [5, 5] }] },
+      options: chartOptions
+    });
+
+    chartL2 = new Chart(document.getElementById('chartLinha2'), {
+      type: 'bar',
+      data: { labels: ['Elétrica', 'Mecânica', 'Operacional', 'Troca Formato', 'Pique Energia'], datasets: [{ label: 'Real (min)', data: [0, 0, 0, 0, 0], backgroundColor: '#f59e0b' }] },
+      options: chartOptions
+    });
+
+    chartL3 = new Chart(document.getElementById('chartLinha3'), {
+      type: 'bar',
+      data: { labels: ['Elétrica', 'Mecânica', 'Operacional', 'Troca Formato', 'Pique Energia'], datasets: [{ label: 'Real (min)', data: [0, 0, 0, 0, 0], backgroundColor: '#14b8a6' }] },
+      options: chartOptions
+    });
+
+    chartCausadores = new Chart(document.getElementById('chartCausadores'), {
+      type: 'bar',
+      data: { labels: ['Nenhum registro'], datasets: [{ label: 'Minutos Parados', data: [0], backgroundColor: '#8b5cf6' }] },
+      options: chartOptions
+    });
+
+    atualizarGraficos();
+  }
+
+  function atualizarGraficos() {
+    let l2Eletrica = 0, l2Mecanica = 0, l2Operacional = 0, l2Pique = 0, l2Troca = 0, l2FalhaForno = 0;
+    let l3Eletrica = 0, l3Mecanica = 0, l3Operacional = 0, l3Pique = 0, l3Troca = 0, l3FalhaForno = 0;
+    const deptSoma = { 'Elétrica': 0, 'Mecânica': 0, 'Operacional': 0, 'Troca de Formato': 0, 'Pique de Energia': 0 };
+    const equipamentosMap = {};
+
+    bancoParadas.forEach(item => {
+      const tempo = parseInt(item.tempo) || 0;
+      equipamentosMap[item.equipamento] = (equipamentosMap[item.equipamento] || 0) + tempo;
+      if (deptSoma[item.categoria] !== undefined) { deptSoma[item.categoria] += tempo; }
+
+      if (item.linha === 'Linha 2') {
+        if (item.categoria === 'Elétrica') l2Eletrica += tempo;
+        else if (item.categoria === 'Mecânica') l2Mecanica += tempo;
+        else if (item.categoria === 'Operacional') l2Operacional += tempo;
+        else if (item.categoria === 'Pique de Energia') l2Pique += tempo;
+        else if (item.categoria === 'Troca de Formato') l2Troca += tempo;
+      } else if (item.linha === 'Linha 3') {
+        if (item.categoria === 'Elétrica') l3Eletrica += tempo;
+        else if (item.categoria === 'Mecânica') l3Mecanica += tempo;
+        else if (item.categoria === 'Operacional') l3Operacional += tempo;
+        else if (item.categoria === 'Pique de Energia') l3Pique += tempo;
+        else if (item.categoria === 'Troca de Formato') l3Troca += tempo;
+      }
+    });
+
+    historicoFechamentos.forEach(h => {
+      const fForno = parseFloat(h.falhaForno) || 0;
+      if (h.linha === 'Linha 2') l2FalhaForno += fForno;
+      if (h.linha === 'Linha 3') l3FalhaForno += fForno;
+    });
+
+    document.getElementById('acc_l2_eletrica').innerText = l2Eletrica + ' min';
+    document.getElementById('acc_l2_mecanica').innerText = l2Mecanica + ' min';
+    document.getElementById('acc_l2_operacional').innerText = l2Operacional + ' min';
+    document.getElementById('acc_l2_falha_forno').innerText = l2FalhaForno + ' min';
+    document.getElementById('acc_l2_troca').innerText = l2Troca + ' min';
+    document.getElementById('acc_l2_pique').innerText = l2Pique + ' min';
+
+    document.getElementById('acc_l3_eletrica').innerText = l3Eletrica + ' min';
+    document.getElementById('acc_l3_mecanica').innerText = l3Mecanica + ' min';
+    document.getElementById('acc_l3_operacional').innerText = l3Operacional + ' min';
+    document.getElementById('acc_l3_falha_forno').innerText = l3FalhaForno + ' min';
+    document.getElementById('acc_l3_troca').innerText = l3Troca + ' min';
+    document.getElementById('acc_l3_pique').innerText = l3Pique + ' min';
+
+    const metaTempo = 840;
+    const l2PerdasEfetivas = l2Eletrica + l2Mecanica + l2Operacional + l2FalhaForno;
+    const l3PerdasEfetivas = l3Eletrica + l3Mecanica + l3Operacional + l3FalhaForno;
+
+    const l2TotalExibido = l2Eletrica + l2Mecanica + l2Operacional + l2FalhaForno + l2Troca + l2Pique;
+    const l3TotalExibido = l3Eletrica + l3Mecanica + l3Operacional + l3FalhaForno + l3Troca + l3Pique;
+
+    const l2Efic = Math.max(0, (((metaTempo - l2PerdasEfetivas) / metaTempo) * 100)).toFixed(1);
+    const l3Efic = Math.max(0, (((metaTempo - l3PerdasEfetivas) / metaTempo) * 100)).toFixed(1);
+
+    document.getElementById('l2_total_time').innerText = l2TotalExibido + ' min';
+    document.getElementById('l2_eficiencia').innerText = l2Efic + '%';
+
+    document.getElementById('l3_total_time').innerText = l3TotalExibido + ' min';
+    document.getElementById('l3_eficiencia').innerText = l3Efic + '%';
+
+    if (chartL2) { chartL2.data.datasets[0].data = [l2Eletrica, l2Mecanica, l2Operacional, l2Troca, l2Pique]; chartL2.update(); }
+    if (chartL3) { chartL3.data.datasets[0].data = [l3Eletrica, l3Mecanica, l3Operacional, l3Troca, l3Pique]; chartL3.update(); }
+
+    if (dashChartDept) {
+      dashChartDept.data.datasets[0].data = [deptSoma['Elétrica'], deptSoma['Mecânica'], deptSoma['Operacional'], deptSoma['Troca de Formato'], deptSoma['Pique de Energia']];
+      dashChartDept.update();
+    }
+
+    const eqLabels = Object.keys(equipamentosMap);
+    const eqValores = Object.values(equipamentosMap);
+    if (dashChartGargalos && eqLabels.length > 0) { dashChartGargalos.data.labels = eqLabels; dashChartGargalos.data.datasets[0].data = eqValores; dashChartGargalos.update(); }
+    if (chartCausadores && eqLabels.length > 0) { chartCausadores.data.labels = eqLabels; chartCausadores.data.datasets[0].data = eqValores; chartCausadores.update(); }
+
+    if (dashChartQuebra && historicoFechamentos.length > 0) {
+      const labels = historicoFechamentos.map(h => `${h.data} (${h.linha} T${h.turno})`);
+      const cacosPorTurno = historicoFechamentos.map(h => h.cacoM2);
+      let somaAcumulada = 0;
+      const cacosAcumulados = historicoFechamentos.map(h => { somaAcumulada += h.cacoM2; return somaAcumulada; });
+      dashChartQuebra.data.labels = labels;
+      dashChartQuebra.data.datasets[0].data = cacosPorTurno;
+      dashChartQuebra.data.datasets[1].data = cacosAcumulados;
+      dashChartQuebra.update();
+    }
+  }
+
+  function renderizarTabelaBD(dados = bancoParadas) {
+    const tbody = document.getElementById('corpoTabelaBD');
+    tbody.innerHTML = '';
+    if (dados.length === 0) { tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; color:#94a3b8;">Nenhum registro encontrado no Banco de Dados.</td></tr>'; return; }
+    dados.forEach(item => {
+      tbody.innerHTML += `<tr>
+          <td>${item.id}</td><td>${item.data}</td><td>${item.linha}</td><td>${item.turno}</td><td>${item.equipamento}</td><td>${item.categoria}</td><td>${item.tempo} min</td><td>${item.desc}</td>
+          <td><button class="btn-edit" onclick="abrirModalEdicao(${item.id})">Editar</button> <button class="btn-danger" onclick="excluirRegistroBD(${item.id})">Excluir</button></td>
+        </tr>`;
+    });
+  }
+
+  function filtrarBD() {
+    const busca = document.getElementById('searchBD').value.toLowerCase();
+    const filtroLinha = document.getElementById('filterLinha').value;
+    const filtrados = bancoParadas.filter(item => {
+      const atendeBusca = item.equipamento.toLowerCase().includes(busca) || item.desc.toLowerCase().includes(busca) || item.categoria.toLowerCase().includes(busca);
+      const atendeLinha = filtroLinha === 'TODAS' || item.linha === filtroLinha;
+      return atendeBusca && atendeLinha;
+    });
+    renderizarTabelaBD(filtrados);
+  }
+
+  function adicionarRegistroBD() {
+    const linha = document.getElementById('bd_linha').value;
+    const data = document.getElementById('bd_data').value;
+    const turno = document.getElementById('bd_turno').value;
+    const equipamento = document.getElementById('bd_equipamento').value;
+    const categoria = document.getElementById('bd_categoria').value;
+    const tempo = parseInt(document.getElementById('bd_tempo').value);
+    const desc = document.getElementById('bd_desc').value.trim();
+
+    if (!equipamento || !tempo || !desc) { alert('Preencha todos os campos do registro.'); return; }
+    const novoId = bancoParadas.length ? Math.max(...bancoParadas.map(b => b.id)) + 1 : 1;
+    bancoParadas.push({ id: novoId, data, linha, turno, equipamento, categoria, tempo, desc });
+    salvarDadosServidor();
+    document.getElementById('bd_tempo').value = ''; document.getElementById('bd_desc').value = '';
+    renderizarTabelaBD(); atualizarGraficos(); alert('Novo registro salvo no servidor!');
+  }
+
+  function excluirRegistroBD(id) {
+    if (confirm('Deseja excluir este registro?')) {
+      bancoParadas = bancoParadas.filter(item => item.id !== id);
+      salvarDadosServidor(); renderizarTabelaBD(); atualizarGraficos();
+    }
+  }
+
+  function abrirModalEdicao(id) {
+    const item = bancoParadas.find(b => b.id === id);
+    if (!item) return;
+    document.getElementById('edit_id').value = item.id;
+    document.getElementById('edit_linha').value = item.linha;
+    document.getElementById('edit_data').value = item.data;
+    document.getElementById('edit_turno').value = item.turno;
+    document.getElementById('edit_equipamento').value = item.equipamento;
+    document.getElementById('edit_categoria').value = item.categoria;
+    document.getElementById('edit_tempo').value = item.tempo;
+    document.getElementById('edit_desc').value = item.desc;
+    document.getElementById('modalEdicao').style.display = 'flex';
+  }
+
+  function fecharModal() { document.getElementById('modalEdicao').style.display = 'none'; }
+
+  function salvarEdicaoBD() {
+    const id = parseInt(document.getElementById('edit_id').value);
+    const item = bancoParadas.find(b => b.id === id);
+    if (item) {
+      item.linha = document.getElementById('edit_linha').value;
+      item.data = document.getElementById('edit_data').value;
+      item.turno = document.getElementById('edit_turno').value;
+      item.equipamento = document.getElementById('edit_equipamento').value;
+      item.categoria = document.getElementById('edit_categoria').value;
+      item.tempo = parseInt(document.getElementById('edit_tempo').value);
+      item.desc = document.getElementById('edit_desc').value;
+      salvarDadosServidor(); renderizarTabelaBD(); atualizarGraficos(); fecharModal(); alert('Registro atualizado com sucesso no servidor!');
+    }
+  }
+
+  function zerarBancoDeDadosTotal() {
+    if (confirm('Atenção: deseja realmente zerar TODOS os registros do Banco de Dados e KPIs?')) {
+      bancoParadas = []; historicoFechamentos = []; historicoEscolha = [];
+      document.getElementById('edit_prod_a_l2').value = 0; document.getElementById('edit_prod_total_l2').value = 0;
+      document.getElementById('edit_prod_a_l3').value = 0; document.getElementById('edit_prod_total_l3').value = 0;
+      document.getElementById('edit_caco_acumulado').value = 0;
+      salvarKPIsDashboard(true); renderizarTabelaBD(); renderizarPlanilhaDiaria(); renderizarTabelaEscolha(); atualizarGraficos(); alert('Banco de dados zerado com sucesso!');
+    }
+  }
+</script>
+</body>
+</html> 

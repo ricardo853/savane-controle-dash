@@ -1,0 +1,53 @@
+{
+  "equipamentos": [
+    "Prensa 01",
+    "Prensa 02",
+    "Forno 01",
+    "Forno 02",
+    "Linha de Esmaltação",
+    "Secador 01"
+  ],
+  "maquinasPosForno": [
+    "Classificador 01",
+    "Classificador 02"
+  ],
+  "bancoParadas": [
+    {
+      "id": 1,
+      "data": "2026-10-01",
+      "linha": "Linha 2",
+      "turno": "1",
+      "equipamento": "Prensa 01",
+      "categoria": "Elétrica",
+      "tempo": 35,
+      "desc": "teste"
+    }
+  ],
+  "historicoFechamentos": [
+    {
+      "data": "2026-10-01",
+      "linha": "Linha 2",
+      "turno": "1",
+      "prodTotal": 4700,
+      "prodA": 4500,
+      "cacoM2": 100,
+      "formato": "31x54",
+      "projetoOrcado": 5600,
+      "cicloForno": 40,
+      "prodEntrada": 4997,
+      "falhaForno": 0,
+      "diferenca": -900,
+      "eficiencia": "100.0%",
+      "qualidade": "94.1%",
+      "quebraPct": "2.1%"
+    }
+  ],
+  "historicoEscolha": [],
+  "kpis": {
+    "prodAL2": 4500,
+    "prodTotalL2": 4700,
+    "prodAL3": 0,
+    "prodTotalL3": 0,
+    "cacoAcumulado": 100
+  }
+}
